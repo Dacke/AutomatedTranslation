@@ -13,6 +13,6 @@ The utility will accept the following command line arguments:
 * /engine - This option will specify the language engine that you would like to use for translation.  The current options are: **[ bing, google ]**
 
 ### Limitations
-* The PO language files MUST have a country assigned to them in order for the translation to work correctly.  _"Language: de_DE\n"_
+* The PO language files MUST have a country assigned to them in order for the translation to work correctly. <br/> _"Language: de_DE\n"_
 * The Microsoft string resource file must be called "Strings.resx" that will be the source of all of the translation.  When adding translations you would need to add them to this file.
-* The Microsoft string resource files for all of your translation must be named for the language that you want to translate them into. _i.e. German must be de_DE.resx_
+* The Microsoft string resource files for all of your translation must be named for the language that you want to translate them into.<br/> _i.e. German must be de_DE.resx_
