@@ -3,26 +3,17 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Cache;
+using System.Text;
 using System.Web;
-using System.Web.Script.Serialization;
-using AutomatedTranslation.Infos;
 
 namespace AutomatedTranslation.Engines
 {
-    public interface IGoogleTranslateEngine
-    {
-        string FromCulture { get; set; }
-        string ToCulture { get; set; }
-        string TranslateWordOrPhrase(string wordOrPhraseToTranslate);
-    }
-
-    public class GoogleTranslateEngine : IGoogleTranslateEngine
+    public class GoogleTranslateEngine : ITranslateEngine
     {
         private const string englishCulture = "en";
-        private const string googleUrlFormat = "http://translate.google.com/translate_a/t?client=webapp&sl={0}&tl={1}&hl=en&q={2}&sc=1";
-
-        private readonly JavaScriptSerializer javaScriptSerializer;
-
+        private const string googleUrlFormat = "http://translate.google.com/translate_a/single?client=webapp&sl={0}&tl={1}&hl=en&dt=bd&dt=ld&dt=qca&dt=rm&dt=t&source=btn&ssel=5&tsel=5&kc=0&tk=520999|681256&q={2}";
+        
         public string FromCulture { get; set; }
         public string ToCulture { get; set; }
 
@@ -30,8 +21,6 @@ namespace AutomatedTranslation.Engines
         {
             FromCulture = englishCulture;
             ToCulture = englishCulture;
-            
-            javaScriptSerializer = new JavaScriptSerializer();
         }
 
         public string TranslateWordOrPhrase(string wordOrPhraseToTranslate)
@@ -49,10 +38,10 @@ namespace AutomatedTranslation.Engines
                         if (responseStream == null)
                             throw new Exception("No response stream found for the given url");
 
-                        var streamReader = new StreamReader(responseStream, System.Text.Encoding.UTF8);
+                        var streamReader = new StreamReader(responseStream, Encoding.UTF8);
                         var responseData = streamReader.ReadToEnd();
 
-                        translatedValue = GetTranslatedValueFromJson(responseData);
+                        translatedValue = GetTranslatedValueFromResponse(responseData);
                     }
                 }                
             }
@@ -70,18 +59,26 @@ namespace AutomatedTranslation.Engines
         {
             var webReq = (HttpWebRequest)WebRequest.Create(url);
             webReq.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+            webReq.CachePolicy = new RequestCachePolicy(RequestCacheLevel.NoCacheNoStore);
             webReq.ContentType = "application/json";
-            webReq.UserAgent = "Opera/12.02 (Android 4.1; Linux; Opera Mobi/ADR-1111101157; U; en-US) Presto/2.9.201 Version/12.02";
+            webReq.Accept = "en-US,en;q=0.5";
+            webReq.UserAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:38.0) Gecko/20100101 Firefox/38.0";
             webReq.Referer = "http://translate.google.com/m/translate";
+            webReq.Host = "translate.google.com";
 
             return webReq;
         }
 
-        private string GetTranslatedValueFromJson(string page)
+        private string GetTranslatedValueFromResponse(string page)
         {
-            var json = javaScriptSerializer.Deserialize<GoogleTranslationResult>(page);
+            var rawValues = page.Split(new [] { @""",""" }, StringSplitOptions.RemoveEmptyEntries);
+            if (rawValues.Length < 2)
+                return null;
+            
+            var translatedValue = rawValues.First().Substring(4).TrimEnd('"');
+            var englishValue = rawValues[0].TrimEnd(']').Trim('"');
 
-            return json.sentences.First().trans;
+            return (string.IsNullOrWhiteSpace(translatedValue) == false) ? translatedValue : englishValue;
         }
     }
 }
