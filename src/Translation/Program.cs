@@ -111,12 +111,15 @@ namespace AutomatedTranslation
             
             var engineArg = args.Single(a => a.StartsWith(PARAMETER_TRANSLATION_ENGINE));
             var engineName = engineArg.Split('=')[1];
-            var validEngineNames = new[] { "bing", "google" };
+            var validEngineNames = new[] { "bing", "google", "translate" };
             if (validEngineNames.Contains(engineName.ToLowerInvariant()) == false)
                 throw new ArgumentOutOfRangeException("/engine", "The specified translation engine is invalid.  Please use one of the following values:\n" + string.Join("\n", validEngineNames));
 
             if (engineName.Equals("Google", StringComparison.CurrentCultureIgnoreCase))
                 TranslationEngine = new GoogleTranslateEngine { FromCulture = "en" };
+
+            if (engineName.Equals("Translate", StringComparison.CurrentCultureIgnoreCase))
+                TranslationEngine = new TranslateTranslationEngine { FromCulture = "en" };
         }
 
         private static void WriteError(string errorMessage)

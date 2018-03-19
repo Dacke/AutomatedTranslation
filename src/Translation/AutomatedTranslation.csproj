@@ -37,6 +37,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.XML" />
@@ -47,9 +48,9 @@
     <Compile Include="Engines\BingTranslateEngine.cs" />
     <Compile Include="Engines\GoogleTranslateEngine.cs" />
     <Compile Include="Engines\ITranslateEngine.cs" />
+    <Compile Include="Engines\TranslateTranslationEngine.cs" />
     <Compile Include="Helpers\IResourceFileHelper.cs" />
     <Compile Include="Helpers\ResourceFileHelper.cs" />
-    <Compile Include="Infos\BingTranslationResult.cs" />
     <Compile Include="Infos\LanguageCode.cs" />
     <Compile Include="Infos\MsConfiguration.cs" />
     <Compile Include="Infos\OutputEventArgs.cs" />

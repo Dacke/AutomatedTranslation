@@ -33,8 +33,7 @@ namespace AutomatedTranslation
                 if (translationFile.IsTranslationFileValid() == false)
                     throw new Exception(string.Format("The translation file '{0}' is not valid!  Check for duplicates in the file or other discrepancies.", translationFile.Filename));
 
-                if (writeLine != null)
-                    writeLine(" -> Processing language file: {0}", translationFile.Filename);
+                writeLine?.Invoke(" -> Processing language file: {0}", translationFile.Filename);
 
                 translateEngine.ToCulture = translationFile.CountryCode.Replace('_', '-');
                 var existingKeys = translationFile.TranslationDictionary.Keys.ToArray();
